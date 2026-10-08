@@ -1,0 +1,452 @@
+{
+ "version": 2,
+ "image": "nisbet.png",
+ "image_size": [
+  790,
+  678
+ ],
+ "class_map": {
+  "0": "Resistor",
+  "1": "Capacitor",
+  "2": "Inductor",
+  "3": "Diode",
+  "4": "LED",
+  "5": "Transistor",
+  "6": "IC",
+  "7": "Connector",
+  "8": "Switch"
+ },
+ "detections": [
+  {
+   "uid": 23,
+   "cls": 7,
+   "xc": 0.465064,
+   "yc": 0.878355,
+   "w": 0.217469,
+   "h": 0.116747,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 7,
+    "sub": "unspecified",
+    "xc": 0.465064,
+    "yc": 0.878355,
+    "w": 0.217469,
+    "h": 0.116747
+   }
+  },
+  {
+   "uid": 24,
+   "cls": 7,
+   "xc": 0.123328,
+   "yc": 0.554703,
+   "w": 0.14274,
+   "h": 0.139061,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 7,
+    "sub": "unspecified",
+    "xc": 0.123328,
+    "yc": 0.554703,
+    "w": 0.14274,
+    "h": 0.139061
+   }
+  },
+  {
+   "uid": 25,
+   "cls": 6,
+   "xc": 0.321179,
+   "yc": 0.637326,
+   "w": 0.113507,
+   "h": 0.23857,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 6,
+    "sub": "unspecified",
+    "xc": 0.321179,
+    "yc": 0.637326,
+    "w": 0.113507,
+    "h": 0.23857
+   }
+  },
+  {
+   "uid": 26,
+   "cls": 7,
+   "xc": 0.290841,
+   "yc": 0.886503,
+   "w": 0.097339,
+   "h": 0.145242,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 7,
+    "sub": "unspecified",
+    "xc": 0.290841,
+    "yc": 0.886503,
+    "w": 0.097339,
+    "h": 0.145242
+   }
+  },
+  {
+   "uid": 27,
+   "cls": 3,
+   "xc": 0.594923,
+   "yc": 0.777636,
+   "w": 0.035759,
+   "h": 0.093718,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 3,
+    "sub": "unspecified",
+    "xc": 0.594923,
+    "yc": 0.777636,
+    "w": 0.035759,
+    "h": 0.093718
+   }
+  },
+  {
+   "uid": 28,
+   "cls": 1,
+   "xc": 0.733289,
+   "yc": 0.523102,
+   "w": 0.02541,
+   "h": 0.060456,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 1,
+    "sub": "unspecified",
+    "xc": 0.733289,
+    "yc": 0.523102,
+    "w": 0.02541,
+    "h": 0.060456
+   }
+  },
+  {
+   "uid": 29,
+   "cls": 0,
+   "xc": 0.761801,
+   "yc": 0.796846,
+   "w": 0.078379,
+   "h": 0.038759,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 0,
+    "sub": "unspecified",
+    "xc": 0.761801,
+    "yc": 0.796846,
+    "w": 0.078379,
+    "h": 0.038759
+   }
+  },
+  {
+   "uid": 30,
+   "cls": 0,
+   "xc": 0.347359,
+   "yc": 0.493854,
+   "w": 0.07869,
+   "h": 0.040219,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 0,
+    "sub": "unspecified",
+    "xc": 0.347359,
+    "yc": 0.493854,
+    "w": 0.07869,
+    "h": 0.040219
+   }
+  },
+  {
+   "uid": 31,
+   "cls": 0,
+   "xc": 0.767334,
+   "yc": 0.582694,
+   "w": 0.052727,
+   "h": 0.032746,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 0,
+    "sub": "unspecified",
+    "xc": 0.767334,
+    "yc": 0.582694,
+    "w": 0.052727,
+    "h": 0.032746
+   }
+  },
+  {
+   "uid": 32,
+   "cls": 0,
+   "xc": 0.435925,
+   "yc": 0.493856,
+   "w": 0.078944,
+   "h": 0.040243,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 0,
+    "sub": "unspecified",
+    "xc": 0.435925,
+    "yc": 0.493856,
+    "w": 0.078944,
+    "h": 0.040243
+   }
+  },
+  {
+   "uid": 33,
+   "cls": 0,
+   "xc": 0.820393,
+   "yc": 0.261661,
+   "w": 0.025995,
+   "h": 0.063152,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 0,
+    "sub": "unspecified",
+    "xc": 0.820393,
+    "yc": 0.261661,
+    "w": 0.025995,
+    "h": 0.063152
+   }
+  },
+  {
+   "uid": 34,
+   "cls": 6,
+   "xc": 0.41602780418105106,
+   "yc": 0.2424239924242424,
+   "w": 0.2979789140774838,
+   "h": 0.40151565151515145,
+   "conf": 1.0,
+   "sub": "sop",
+   "added": false,
+   "orig": {
+    "cls": 6,
+    "sub": "unspecified",
+    "xc": 0.382947,
+    "yc": 0.227207,
+    "w": 0.246988,
+    "h": 0.454415
+   }
+  },
+  {
+   "uid": 35,
+   "cls": 7,
+   "xc": 0.1166883789796701,
+   "yc": 0.3158587474747475,
+   "w": 0.10638999999999997,
+   "h": 0.299858,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 7,
+    "sub": "unspecified",
+    "xc": 0.117772,
+    "yc": 0.318384,
+    "w": 0.10639,
+    "h": 0.299858
+   }
+  },
+  {
+   "uid": 36,
+   "cls": 7,
+   "xc": 0.113455,
+   "yc": 0.720587,
+   "w": 0.103502,
+   "h": 0.142843,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 7,
+    "sub": "unspecified",
+    "xc": 0.113455,
+    "yc": 0.720587,
+    "w": 0.103502,
+    "h": 0.142843
+   }
+  },
+  {
+   "uid": 37,
+   "cls": 5,
+   "xc": 0.770383,
+   "yc": 0.747638,
+   "w": 0.038551,
+   "h": 0.04291,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 5,
+    "sub": "unspecified",
+    "xc": 0.770383,
+    "yc": 0.747638,
+    "w": 0.038551,
+    "h": 0.04291
+   }
+  },
+  {
+   "uid": 38,
+   "cls": 1,
+   "xc": 0.770689,
+   "yc": 0.746865,
+   "w": 0.038509,
+   "h": 0.043463,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 1,
+    "sub": "unspecified",
+    "xc": 0.770689,
+    "yc": 0.746865,
+    "w": 0.038509,
+    "h": 0.043463
+   }
+  },
+  {
+   "uid": 39,
+   "cls": 2,
+   "xc": 0.769377,
+   "yc": 0.8653,
+   "w": 0.08632,
+   "h": 0.079468,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 2,
+    "sub": "unspecified",
+    "xc": 0.769377,
+    "yc": 0.8653,
+    "w": 0.08632,
+    "h": 0.079468
+   }
+  },
+  {
+   "uid": 40,
+   "cls": 4,
+   "xc": 0.7012910647548563,
+   "yc": 0.19462724503003564,
+   "w": 0.020328129509712804,
+   "h": 0.03988449006007143,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 4,
+    "sub": "unspecified",
+    "xc": 0.702255,
+    "yc": 0.196259,
+    "w": 0.022256,
+    "h": 0.043148
+   }
+  },
+  {
+   "uid": 41,
+   "cls": 1,
+   "xc": 0.8032464382455592,
+   "yc": 0.1464067260885927,
+   "w": 0.033574581965932264,
+   "h": 0.11024959940274594,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": true,
+   "orig": null
+  },
+  {
+   "uid": 42,
+   "cls": 1,
+   "xc": 0.8308714813546961,
+   "yc": 0.05489340185981725,
+   "w": 0.08255681753526409,
+   "h": 0.025972531463139083,
+   "conf": 1.0,
+   "sub": "tantalum",
+   "added": true,
+   "orig": null
+  },
+  {
+   "uid": 43,
+   "cls": 1,
+   "xc": 0.22885139486756934,
+   "yc": 0.3294861719456115,
+   "w": 0.04680093243736002,
+   "h": 0.10195124245845322,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": true,
+   "orig": null
+  },
+  {
+   "uid": 44,
+   "cls": 0,
+   "xc": 0.20796413502109706,
+   "yc": 0.27588383838383834,
+   "w": 0.037926735711545846,
+   "h": 0.13762626262626262,
+   "conf": 1.0,
+   "sub": "array",
+   "added": true,
+   "orig": null
+  }
+ ],
+ "deleted": [
+  {
+   "uid": 45,
+   "cls": 0,
+   "xc": 0.52372,
+   "yc": 0.739883,
+   "w": 0.064463,
+   "h": 0.025165,
+   "conf": 1.0,
+   "sub": "unspecified",
+   "added": false,
+   "orig": {
+    "cls": 0,
+    "sub": "unspecified",
+    "xc": 0.52372,
+    "yc": 0.739883,
+    "w": 0.064463,
+    "h": 0.025165
+   }
+  }
+ ],
+ "view": {
+  "zoom": 0.7943295897213912,
+  "off_x": 196.23981206005044,
+  "off_y": 126.72226908444839,
+  "mode": "modify"
+ },
+ "added_count": 4,
+ "deleted_count": 1,
+ "reclassified_count": 0,
+ "geometry_count": 3,
+ "subcategory_count": 3,
+ "operations": 5,
+ "added_by_class": {
+  "Capacitor": 3,
+  "Resistor": 1
+ },
+ "deleted_by_class": {
+  "Resistor": 1
+ },
+ "reclassified_from_to": {}
+}
