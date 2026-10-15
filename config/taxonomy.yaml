@@ -1,0 +1,288 @@
+# =============================================================================
+# InventoryVision - component taxonomy (macro classes -> subcategories)
+# =============================================================================
+#
+# The detection model only predicts Macro class (i.e. Resistor, IC,...)
+# Subcategories are assigned by a human after inference (--human). If no subcategory
+# is assigned after human review, it is automatically assigned "unspecified" subcat, 
+# reproducing exactly the same original InventoryVision behaviour.
+#
+# Per subcategory you can set:
+#   label            text shown in the GUI and in the Excel output
+#   short            short tag drawn on the boxes (optional)
+#   ecoinvent_flow   reference product used for the LCI (inherits the macro one)
+#   flow_verified    true  = name used in the published InventoryVision tool, or
+#                            found in a public listing of ecoinvent datasets
+#                    false = plausible ecoinvent name, NOT checked against your
+#                            ecoinvent version
+#   mass_model       optional override of the area->mass regression of the macro
+#                    class: [a_fit, a_pi_low, a_pi_high, b] (mass in mg, area in
+#                    mm^2). Leave absent to inherit (no subcategory-specific
+#                    regression exists yet - fitting them is future work).
+#   dpr              ICs only: die-to-package ratio {nominal, low, high, source}
+#   stack_count      ICs only: number of stacked packages/dies sharing the
+#                    visible footprint (e.g. package-on-package)
+#   note             free text, copied to the "Assumptions" sheet
+#
+# Sources for DPR values:
+#   [Teehan]  P. Teehan, M. Kandlikar (2014), average DPR ~7.8 % (used by ecoinvent)
+#   [Proske]  M. Proske et al., "Investigation of Semiconductor Die Area as a
+#             Reference Variable for LCA", Electronics Goes Green 2024+.
+# =============================================================================
+
+version: 1
+
+classes:
+
+  resistors:
+    label: Resistor
+    model_names: [Resistor, resistor, resistors]
+    ecoinvent_flow: "market for resistor, surface-mounted"
+    flow_verified: true
+    subcategories:
+      smd_chip:
+        label: "SMD chip (0201-2512)"
+        short: chip
+      smd_melf:
+        label: "SMD MELF"
+        short: MELF
+      array:
+        label: "SMD resistor array"
+        short: array
+      tht_film:
+        label: "THT film (carbon/metal)"
+        short: THT
+        ecoinvent_flow: "market for resistor, metal film type, through-hole mounting"
+        flow_verified: false
+      tht_wirewound:
+        label: "THT wirewound (power)"
+        short: wire
+        ecoinvent_flow: "market for resistor, wirewound, through-hole mounting"
+        flow_verified: false
+
+  capacitors:
+    label: Capacitor
+    model_names: [Capacitor, capacitor, capacitors]
+    ecoinvent_flow: "market for capacitor, for surface-mounting"
+    flow_verified: true
+    subcategories:
+      mlcc:
+        label: "SMD ceramic (MLCC)"
+        short: MLCC
+      tantalum:
+        label: "SMD tantalum"
+        short: Ta
+        ecoinvent_flow: "market for capacitor, tantalum-, for surface-mounting"
+        flow_verified: false
+      alu_smd:
+        label: "SMD aluminium electrolytic"
+        short: Al-SMD
+        ecoinvent_flow: "market for capacitor, electrolyte type, < 2cm height"
+        flow_verified: true
+        note: "Proxy: the ecoinvent electrolytic datasets are through-hole parts."
+      alu_tht_small:
+        label: "THT electrolytic < 2 cm"
+        short: Al<2
+        ecoinvent_flow: "market for capacitor, electrolyte type, < 2cm height"
+        flow_verified: true
+      alu_tht_large:
+        label: "THT electrolytic > 2 cm"
+        short: Al>2
+        ecoinvent_flow: "market for capacitor, electrolyte type, > 2cm height"
+        flow_verified: true
+      film_tht:
+        label: "THT film"
+        short: film
+        ecoinvent_flow: "market for capacitor, film type, for through-hole mounting"
+        flow_verified: false
+      ceramic_tht:
+        label: "THT ceramic disc"
+        short: disc
+        note: "No dedicated dataset known: falls back on the SMD capacitor flow."
+
+  inductors:
+    label: Inductor
+    model_names: [Inductor, inductor, inductors]
+    ecoinvent_flow: "market for inductor, low value multilayer chip"
+    flow_verified: true
+    subcategories:
+      chip_multilayer:
+        label: "SMD multilayer chip"
+        short: chip
+      rf_chip:
+        label: "SMD RF chip (wire-wound)"
+        short: RF
+        ecoinvent_flow: "market for inductor, miniature RF chip type, MRFI"
+        flow_verified: false
+      power_smd:
+        label: "SMD power (shielded)"
+        short: pwr
+        ecoinvent_flow: "market for inductor, ring core choke type"
+        flow_verified: true
+        note: "Proxy: ring core choke is a through-hole dataset."
+      toroid:
+        label: "THT toroid / choke"
+        short: toroid
+        ecoinvent_flow: "market for inductor, ring core choke type"
+        flow_verified: true
+
+  diodes:
+    label: Diode
+    model_names: [Diode, diode, diodes]
+    ecoinvent_flow: "market for diode, glass-, for surface-mounting"
+    flow_verified: true
+    subcategories:
+      smd_signal:
+        label: "SMD small-signal (SOD/SOT-23)"
+        short: SOD
+      smd_power:
+        label: "SMD power (SMA/SMB/SMC)"
+        short: SMx
+      tht:
+        label: "THT (DO-35/DO-41)"
+        short: THT
+        ecoinvent_flow: "market for diode, glass-, for through-hole mounting"
+        flow_verified: false
+      bridge:
+        label: "Bridge rectifier"
+        short: bridge
+        ecoinvent_flow: "market for diode, glass-, for through-hole mounting"
+        flow_verified: false
+        note: "Proxy: no bridge rectifier dataset known."
+
+  leds:
+    label: LED
+    model_names: [LED, led, leds]
+    ecoinvent_flow: "market for light emitting diode"
+    flow_verified: true
+    subcategories:
+      smd:
+        label: "SMD LED"
+        short: SMD
+      tht:
+        label: "THT LED (3/5 mm)"
+        short: THT
+
+  transistors:
+    label: Transistor
+    model_names: [Transistor, transistor, transistors]
+    ecoinvent_flow: "market for transistor, surface-mounted"
+    flow_verified: true
+    subcategories:
+      smd_small:
+        label: "SMD small-signal (SOT-23/323)"
+        short: SOT
+      smd_power:
+        label: "SMD power (DPAK/D2PAK/PowerPAK)"
+        short: DPAK
+      tht_small:
+        label: "THT small (TO-92)"
+        short: TO92
+        ecoinvent_flow: "market for transistor, wired, small size, through-hole mounting"
+        flow_verified: true
+      tht_large:
+        label: "THT power (TO-220/TO-247)"
+        short: TO220
+        ecoinvent_flow: "market for transistor, wired, big size, through-hole mounting"
+        flow_verified: true
+
+  connectors:
+    label: Connector
+    model_names: [Connector, connector, connectors]
+    ecoinvent_flow: "market for electric connector, peripheral type buss"
+    flow_verified: true
+    subcategories:
+      pin_header:
+        label: "Pin header / socket strip"
+        short: header
+      io:
+        label: "I/O (USB, HDMI, RJ45, jack)"
+        short: I/O
+      board_to_board:
+        label: "Board-to-board / FPC-FFC"
+        short: B2B
+      card_slot:
+        label: "Card slot (SD, SIM, PCIe, M.2)"
+        short: slot
+        ecoinvent_flow: "market for electric connector, peripheral component interconnect buss"
+        flow_verified: false
+      terminal_block:
+        label: "Screw terminal block"
+        short: term
+        ecoinvent_flow: "market for electric connector, wire clamp"
+        flow_verified: false
+      rf_coax:
+        label: "RF coaxial (SMA, U.FL)"
+        short: RF
+
+  ics:
+    label: IC
+    model_names: [IC, ic, ics]
+    ecoinvent_flow: "market for integrated circuit, logic type"
+    flow_verified: true
+    # DPR used when the package is unknown (= original InventoryVision behaviour).
+    # low/high = envelope of the package-specific values below: this is an
+    # assumption of this tool, chosen to show how much uncertainty an unknown
+    # package type carries.
+    dpr: {nominal: 0.078, low: 0.07, high: 0.94, source: "Teehan 2014"}
+    subcategories:
+      sop:
+        label: "SOP / SOIC / TSSOP"
+        short: SOP
+        dpr: {nominal: 0.135, low: 0.13, high: 0.14, source: "Proske 2024"}
+      qfp:
+        label: "QFP / LQFP / TQFP"
+        short: QFP
+        dpr: {nominal: 0.078, low: 0.07, high: 0.94, source: "Not reported in secondary source: Teehan nominal, envelope bounds"}
+        note: "No QFP-specific DPR found yet; check Proske et al. directly."
+      qfn:
+        label: "QFN / DFN (no-lead)"
+        short: QFN
+        dpr: {nominal: 0.28, source: "Proske 2024"}
+      bga:
+        label: "BGA (logic, SoC)"
+        short: BGA
+        dpr: {nominal: 0.36, low: 0.07, high: 0.94, source: "Proske 2024"}
+      bga_memory:
+        label: "BGA memory (DRAM/flash)"
+        short: BGA-M
+        ecoinvent_flow: "market for integrated circuit, memory type"
+        flow_verified: false
+        dpr: {nominal: 0.36, low: 0.07, high: 0.94, source: "Proske 2024 BGA values "}
+      tsop_memory:
+        label: "TSOP memory (flash)"
+        short: TSOP-M
+        ecoinvent_flow: "market for integrated circuit, memory type"
+        flow_verified: false
+        dpr: {nominal: 0.135, low: 0.13, high: 0.14, source: "SOP values used as proxy"}
+        note: "Proxy: TSOP assumed close to SOP."
+      csp:
+        label: "CSP / WLCSP"
+        short: CSP
+        dpr: {nominal: 0.725, low: 0.70, high: 0.75, source: "Proske 2024"}
+      pop:
+        label: "Package-on-package (stacked)"
+        short: PoP
+        dpr: {nominal: 0.36, low: 0.07, high: 0.94, source: "Proske 2024 BGA values"}
+        stack_count: 2
+        note: "Assumption: two stacked packages with the same footprint (SoC + memory). Both counted on the logic flow."
+      dip_tht:
+        label: "DIP / THT"
+        short: DIP
+        dpr: {nominal: 0.078, low: 0.07, high: 0.94, source: "Not reported: Teehan nominal, envelope bounds"}
+
+  switches:
+    label: Switch
+    model_names: [Switch, switch, switches]
+    ecoinvent_flow: null
+    note: "Class present in model/best.pt but not in the paper: no mass model and no flow yet."
+    subcategories:
+      tactile:
+        label: "Tactile push button"
+        short: tact
+      slide:
+        label: "Slide switch"
+        short: slide
+      dip:
+        label: "DIP switch"
+        short: DIP

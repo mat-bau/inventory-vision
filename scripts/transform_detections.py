@@ -101,7 +101,9 @@ def transform_yolo_detections(input_labels_file, output_labels_file,
             width_norm = float(parts[3])
             height_norm = float(parts[4])
             confidence = float(parts[5]) if len(parts) > 5 else None
-            
+            # Extra columns (e.g. the subcategory written by the review GUI) are kept as-is
+            extra = (" " + " ".join(parts[6:])) if len(parts) > 6 else ""
+
             # Convert normalized coordinates to absolute pixels in original image
             x_center = x_center_norm * original_img_width
             y_center = y_center_norm * original_img_height
@@ -182,11 +184,11 @@ def transform_yolo_detections(input_labels_file, output_labels_file,
             # Write with confidence if it was present
             if confidence is not None:
                 transformed_lines.append(
-                    f"{class_id} {new_x_center:.6f} {new_y_center:.6f} {new_width:.6f} {new_height:.6f} {confidence:.6f}\n"
+                    f"{class_id} {new_x_center:.6f} {new_y_center:.6f} {new_width:.6f} {new_height:.6f} {confidence:.6f}{extra}\n"
                 )
             else:
                 transformed_lines.append(
-                    f"{class_id} {new_x_center:.6f} {new_y_center:.6f} {new_width:.6f} {new_height:.6f}\n"
+                    f"{class_id} {new_x_center:.6f} {new_y_center:.6f} {new_width:.6f} {new_height:.6f}{' 1.000000' + extra if extra else ''}\n"
                 )
     
     # Write transformed labels
@@ -201,7 +203,7 @@ def transform_yolo_detections(input_labels_file, output_labels_file,
     print(f"   - Partially outside:     {kept_partial} (kept full box)")
     print(f"   Skipped (outside):       {skipped_outside}")
     print(f"   Skipped (< {min_overlap_threshold*100:.0f}% overlap): {skipped_low_overlap}")
-    print(f"   Success rate:            {len(transformed_lines)/total_input*100:.1f}%")
+    print(f"   Success rate:            {len(transformed_lines)/max(total_input, 1)*100:.1f}%")
     
     # Create debug visualization of cropped image if requested
     if debug_image_path and transformed_lines:

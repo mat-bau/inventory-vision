@@ -1,7 +1,7 @@
+import json
 import math
 import sys
 from collections import defaultdict
-import json
 
 default_class_map = {
     0: "resistors",
@@ -67,7 +67,15 @@ def _mass_bounds(cls, area_min, area_nom, area_max):
     This is consistent with the quadratic roll-up already used across
     component classes at the board level.
     """
-    a, a_low, a_high, b = mass_model_map[cls]
+    return mass_bounds_from_coeffs(mass_model_map[cls], area_min, area_nom, area_max)
+
+
+def mass_bounds_from_coeffs(coeffs, area_min, area_nom, area_max):
+    """Same as _mass_bounds, with explicit coefficients (a_fit, a_low, a_high, b).
+
+    Used for subcategory-specific mass models (config/taxonomy.yaml).
+    """
+    a, a_low, a_high, b = coeffs
 
     # --- nominal mass ---
     m_nom = a * (area_nom ** b)

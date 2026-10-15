@@ -1,18 +1,19 @@
-from scripts import detection_classification, crop_board, component_to_mass
-from scripts.transform_detections import transform_yolo_detections
-
 import argparse
 import json
 import os
 import sys
+
 import cv2
-
 import pandas as pd
-
 import pyfiglet
 from rich import print
-
 from ultralytics import YOLO
+
+from scripts import component_to_mass, crop_board, detection_classification, lci
+from scripts.labels import read_labels, write_labels
+from scripts.taxonomy import UNSPECIFIED, Taxonomy
+from scripts.transform_detections import transform_yolo_detections
+
 
 def ask_positive_float(prompt):
     """
@@ -49,7 +50,7 @@ def analyze_detection_file(detection_file, class_map, conf_thresholds, title="DE
         return {}, []
     
     if os.path.getsize(detection_file) == 0:
-        print(f"⚠️ Warning: Detection file is empty")
+        print("⚠️ Warning: Detection file is empty")
         return {}, []
     
     class_counts = {}  # Only counts above threshold
@@ -143,6 +144,7 @@ def extract_individual_ic_areas(labels_file, class_map, conf_thresholds, image_w
             y_center_norm = float(parts[2])
             width_norm    = float(parts[3])
             height_norm   = float(parts[4])
+            subcategory   = parts[6] if len(parts) > 6 else UNSPECIFIED
 
             width_mm_comp  = width_norm  * image_width_mm
             height_mm_comp = height_norm * image_height_mm
@@ -152,6 +154,7 @@ def extract_individual_ic_areas(labels_file, class_map, conf_thresholds, image_w
             ic_records.append({
                 'image':         image_label,
                 'ic_index':      ic_index,
+                'subcategory':   subcategory,
                 'x_center_norm': round(x_center_norm, 6),
                 'y_center_norm': round(y_center_norm, 6),
                 'width_norm':    round(width_norm, 6),
@@ -182,7 +185,23 @@ def main():
     parser.add_argument('--individual-ic', action='store_true',
                         help="Output the area of each individual IC detection to a separate "
                              "CSV/Excel file.")
+    parser.add_argument('--taxonomy', default=None,
+                        help="Subcategory definitions (default: config/taxonomy.yaml)")
+    parser.add_argument('--impact-factors', default=None,
+                        help="Impact factors per ecoinvent flow (default: config/impact_factors.yaml)")
+    parser.add_argument('--gui-size', default="1360x820",
+                        help="Size of the review window in pixels, WIDTHxHEIGHT (default: 1360x820)")
     args = parser.parse_args()
+
+    try:
+        gui_size = tuple(int(v) for v in args.gui_size.lower().split('x'))
+        assert len(gui_size) == 2
+    except (ValueError, AssertionError):
+        print(f"Error: --gui-size must look like 1360x820 (got '{args.gui_size}').")
+        sys.exit(1)
+
+    taxonomy = Taxonomy.load(args.taxonomy)
+    impact_factors = lci.ImpactFactors.load(args.impact_factors)
 
     image_paths = args.input
     if len(image_paths) > 1:
@@ -219,6 +238,10 @@ def main():
     for cls_id, cls_name in model_class_names.items():
         default_class_map[cls_id] = cls_name
 
+    unmatched = [n for n in default_class_map.values() if taxonomy.macro(n) is None]
+    if unmatched:
+        print(f"⚠️  Model classes without a taxonomy entry (no subcategories, no LCI flow): {unmatched}")
+
     conf_thresholds = {}
     for cls_name in default_class_map.values():
         if cls_name.lower() in ["ic", "ics"]:
@@ -249,6 +272,7 @@ def main():
     all_uncertainties      = []
     all_individual_ic_areas = []
     all_modifications_per_class = []
+    all_lci_records = []          # one record per detection, all images (subcategory LCI)
 
     for idx, board_image_path in enumerate(image_paths):
         print(f"\n{'='*60}")
@@ -306,7 +330,8 @@ def main():
             all_modifications_per_class.append({})
             continue
 
-        if os.path.getsize(detection_file) == 0:
+        # In --human mode an empty file is not a dead end: boxes can still be added by hand.
+        if os.path.getsize(detection_file) == 0 and not args.human:
             print(f"⚠️ Warning: Detection file is empty (no components detected)")
             all_total_mass.append({})
             all_total_ic_area.append(0)
@@ -333,60 +358,40 @@ def main():
         if args.human:
             try:
                 import numpy as np
+
                 from scripts.human_correction import HumanCorrectionGUI
             except Exception as e:
                 print(f"Error importing human correction GUI: {e}")
                 print("Skipping human correction.")
             else:
-                detections = []
-                
+                # The GUI reloads the state file itself when it exists (it keeps the
+                # history of corrections); the label file is the starting point otherwise.
+                detections = read_labels(detection_file)
                 if os.path.exists(state_file):
-                    try:
-                        with open(state_file, 'r') as f:
-                            state = json.load(f)
-                        detections = [det[:6] for det in state.get('detections', [])]
-                        print(f"📁 Loaded {len(detections)} detections from state file")
-                    except Exception as e:
-                        print(f"❌ Error loading detections from state file: {e}")
-                
-                if not detections:
-                    with open(detection_file, 'r') as f:
-                        for line in f:
-                            parts = line.strip().split()
-                            if len(parts) >= 5:
-                                while len(parts) < 6:
-                                    parts.append("1.0")
-                                try:
-                                    vals = list(map(float, parts[:6]))
-                                    detections.append(vals)
-                                except ValueError:
-                                    continue
+                    print(f"📁 Resuming review from state file: {state_file}")
 
-                if len(detections) == 0:
-                    print("⚠️ No detections to correct in human mode.")
-                else:
-                    print("\n" + "="*60)
-                    print("STARTING HUMAN INTERFACE (--human mode)")
-                    print("="*60 + "\n")
+                print("\n" + "="*60)
+                print("STARTING HUMAN INTERFACE (--human mode)")
+                print("="*60 + "\n")
 
-                    gui = HumanCorrectionGUI(
-                        image_path=board_image_path,
-                        detections=detections,
-                        class_map=default_class_map,
-                        state_file=state_file
-                    )
+                gui = HumanCorrectionGUI(
+                    image_path=board_image_path,
+                    detections=detections,
+                    class_map=default_class_map,
+                    taxonomy=taxonomy,
+                    state_file=state_file,
+                    window_size=gui_size,
+                )
 
-                    corrected = gui.run()
+                corrected = gui.run()
 
-                    try:
-                        with open(detection_file, 'w') as f:
-                            for det in corrected:
-                                cls_id = int(det[0])
-                                x, y, w_box, h_box, conf = det[1], det[2], det[3], det[4], det[5]
-                                f.write(f"{cls_id} {x:.6f} {y:.6f} {w_box:.6f} {h_box:.6f} {conf:.6f}\n")
-                        print("✅ Human corrections applied and saved to detection file.")
-                    except Exception as e:
-                        print(f"Error while saving corrected detections: {e}")
+                try:
+                    write_labels(detection_file, corrected)
+                    n_sub = sum(1 for d in corrected if d.get("sub", UNSPECIFIED) != UNSPECIFIED)
+                    print(f"Human corrections saved to detection file "
+                          f"({len(corrected)} boxes, {n_sub} with a subcategory).")
+                except Exception as e:
+                    print(f"Error while saving corrected detections: {e}")
 
 
 
@@ -423,6 +428,7 @@ def main():
                     print("   ✅ Using saved crop and dimensions.")
 
                     import numpy as np
+
                     from scripts.crop_board import crop_and_warp
                     image  = cv2.imread(board_image_path)
                     warped = crop_and_warp(image, crop_points)
@@ -446,6 +452,7 @@ def main():
                     crop_points.append((float(coords[0]), float(coords[1])))
 
                 import numpy as np
+
                 from scripts.crop_board import crop_and_warp
                 image  = cv2.imread(board_image_path)
                 warped = crop_and_warp(image, crop_points)
@@ -453,9 +460,15 @@ def main():
                 print(f"Saved cropped image to: {board_image_cropped_path}")
             else:
                 print("Performing manual cropping via graphical interface...")
-                crop_board.main(input_path=board_image_path, output_path=board_image_cropped_path, term=False)
-                from scripts.crop_board import clicked_points
-                crop_points = clicked_points
+                while True:
+                    crop_points = crop_board.main(input_path=board_image_path, output_path=board_image_cropped_path, term=False)
+                    if crop_points is not None:
+                        break
+                    retry = ''
+                    while retry.lower() not in ['y', 'n']:
+                        retry = input("Cropping cancelled. Retry? (y/n): ").strip()
+                    if retry.lower() == 'n':
+                        sys.exit("Aborted: no crop selected.")
 
             print("\nPlease enter the real-world dimensions of the PCB (in millimeters):")
             height_mm = ask_positive_float("Height (mm): ")
@@ -482,7 +495,7 @@ def main():
         input_labels  = detection_file
         output_labels = f"output/labels/{filename_with_side}_cropped.txt"
 
-        print(f"\nTransforming detections from full image to cropped space...")
+        print("\nTransforming detections from full image to cropped space...")
         n_transformed = transform_yolo_detections(
             input_labels_file=input_labels,
             output_labels_file=output_labels,
@@ -668,6 +681,17 @@ def main():
         all_counts_per_class.append(counts_per_class)
         all_uncertainties.append(uncertainty)
         all_modifications_per_class.append(modifications_per_class)
+
+        ##-- SUBCATEGORY LCI RECORDS (die area per package type, flows, impacts) --
+        all_lci_records.extend(lci.records_from_labels(
+            label_file=output_labels,
+            class_map=default_class_map,
+            taxonomy=taxonomy,
+            width_mm=width_mm,
+            height_mm=height_mm,
+            bbox_uncertainty_pct=args.bbox_uncertainty,
+            image_label=filename_with_side,
+        ))
 
         ##-- INDIVIDUAL IC AREAS --
         if args.individual_ic:
@@ -903,14 +927,22 @@ def main():
                          .replace('_side1', '').replace('_side2', ''))
         output_xlsx = os.path.join("output", f"{base_filename}_metrics.xlsx")
 
-    df.to_excel(output_xlsx, index=False, sheet_name='Component Metrics')
+    with pd.ExcelWriter(output_xlsx) as writer:
+        # Original sheet, unchanged (one row per macro class)
+        df.to_excel(writer, index=False, sheet_name='Component Metrics')
+        # New sheets: LCI by subcategory, per-component records, impacts, assumptions
+        lci_rows, lci_totals, lci_missing = lci.write_excel_sheets(
+            writer, all_lci_records, taxonomy, impact_factors, args.bbox_uncertainty)
+
+    lci.print_summary(lci_rows, lci_totals, lci_missing, impact_factors)
 
     print(f"\n{'='*60}")
     print(f"✅ Component metrics saved to: {output_xlsx}")
+    print("   - Sheets: Component Metrics, LCI by subcategory, Components, Impacts, Assumptions")
     if len(image_paths) > 1:
         print(f"   - Merged results from {len(image_paths)} images")
     print(f"   - ICs: total area = {merged_ic_area:.3f} mm²")
-    print(f"   - Connectors: default mass calculation")
+    print("   - Connectors: default mass calculation")
     print(f"{'='*60}")
     print(f"\n  Total mass (nominal) : {merged_total_nom:.2f} mg")
     print(f"  Model PI only        : [{merged_total_model_low:.2f} – {merged_total_model_high:.2f}] mg")
@@ -925,7 +957,7 @@ def main():
 
         if all_records:
             ic_df = pd.DataFrame(all_records, columns=[
-                'image', 'ic_index',
+                'image', 'ic_index', 'subcategory',
                 'x_center_norm', 'y_center_norm',
                 'width_norm', 'height_norm',
                 'confidence',
@@ -938,6 +970,7 @@ def main():
                 'global_index': '',
                 'image': 'TOTAL',
                 'ic_index': len(ic_df),
+                'subcategory': '',
                 'x_center_norm': '', 'y_center_norm': '',
                 'width_norm': '', 'height_norm': '',
                 'confidence': '',

@@ -1,5 +1,6 @@
-import cv2
 from pathlib import Path
+
+import cv2
 from ultralytics import YOLO
 
 
@@ -118,7 +119,8 @@ class PCBDetector:
             y_center = ((b['y1'] + b['y2']) / 2) / height
             box_w = (b['x2'] - b['x1']) / width
             box_h = (b['y2'] - b['y1']) / height
-            lines.append(f"{cls_id} {x_center:.6f} {y_center:.6f} {box_w:.6f} {box_h:.6f}")
+            # confidence kept as 6th column: shown in the review GUI and used for its review order
+            lines.append(f"{cls_id} {x_center:.6f} {y_center:.6f} {box_w:.6f} {box_h:.6f} {det['confidence']:.6f}")
 
         out_txt = lbl_dir / f"{img_name}.txt"
         out_txt.write_text("\n".join(lines))

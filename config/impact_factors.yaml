@@ -1,0 +1,56 @@
+# =============================================================================
+# InventoryVision - impact factors TODO
+# =============================================================================
+#
+# Characterisation results per unit of each ecoinvent reference product.
+#
+# A flow left at null is reported as "missing factor" in the Excel output; the
+# impact totals then only cover the flows that have factors.
+#
+# Units: masses are converted from mg to kg, so per-kg factors are expected
+# (basis: kg). For integrated circuits two options exist:
+#   basis: kg       + ic_die_conversion.kg_per_cm2_die  (die area -> abstract
+#                   mass, the approach of the paper, Sec. IV-C), or
+#   basis: die_cm2  factors given directly per cm^2 of silicon die.
+# =============================================================================
+
+method: "EF v3.1"
+
+categories:
+  gwp:
+    label: "Climate change (GWP100)"
+    unit: "kg CO2-eq"
+  mrd:
+    label: "Resource use, minerals and metals"
+    unit: "kg Sb-eq"
+
+# Die area -> quantity of the IC reference product (kg per cm^2 of die)..
+ic_die_conversion:
+  "market for integrated circuit, logic type":
+    kg_per_cm2_die: null # reponse 8.5 kg /cm2 ?
+  "market for integrated circuit, memory type":
+    kg_per_cm2_die: null
+
+flows:
+  "market for resistor, surface-mounted":                  {basis: kg, gwp: null, mrd: null}
+  "market for resistor, metal film type, through-hole mounting": {basis: kg, gwp: null, mrd: null}
+  "market for resistor, wirewound, through-hole mounting": {basis: kg, gwp: null, mrd: null}
+  "market for capacitor, for surface-mounting":            {basis: kg, gwp: null, mrd: null}
+  "market for capacitor, tantalum-, for surface-mounting": {basis: kg, gwp: null, mrd: null}
+  "market for capacitor, electrolyte type, < 2cm height":  {basis: kg, gwp: null, mrd: null}
+  "market for capacitor, electrolyte type, > 2cm height":  {basis: kg, gwp: null, mrd: null}
+  "market for capacitor, film type, for through-hole mounting": {basis: kg, gwp: null, mrd: null}
+  "market for inductor, low value multilayer chip":        {basis: kg, gwp: null, mrd: null}
+  "market for inductor, miniature RF chip type, MRFI":     {basis: kg, gwp: null, mrd: null}
+  "market for inductor, ring core choke type":             {basis: kg, gwp: null, mrd: null}
+  "market for diode, glass-, for surface-mounting":        {basis: kg, gwp: null, mrd: null}
+  "market for diode, glass-, for through-hole mounting":   {basis: kg, gwp: null, mrd: null}
+  "market for light emitting diode":                       {basis: kg, gwp: null, mrd: null}
+  "market for transistor, surface-mounted":                {basis: kg, gwp: null, mrd: null}
+  "market for transistor, wired, small size, through-hole mounting": {basis: kg, gwp: null, mrd: null}
+  "market for transistor, wired, big size, through-hole mounting":   {basis: kg, gwp: null, mrd: null}
+  "market for electric connector, peripheral type buss":   {basis: kg, gwp: null, mrd: null}
+  "market for electric connector, peripheral component interconnect buss": {basis: kg, gwp: null, mrd: null}
+  "market for electric connector, wire clamp":             {basis: kg, gwp: null, mrd: null}
+  "market for integrated circuit, logic type":             {basis: kg, gwp: null, mrd: null}
+  "market for integrated circuit, memory type":            {basis: kg, gwp: null, mrd: null}
