@@ -15,10 +15,6 @@
 #                            found in a public listing of ecoinvent datasets
 #                    false = plausible ecoinvent name, NOT checked against your
 #                            ecoinvent version
-#   mass_model       optional override of the area->mass regression of the macro
-#                    class: [a_fit, a_pi_low, a_pi_high, b] (mass in mg, area in
-#                    mm^2). Leave absent to inherit (no subcategory-specific
-#                    regression exists yet - fitting them is future work).
 #   dpr              ICs only: die-to-package ratio {nominal, low, high, source}
 #   stack_count      ICs only: number of stacked packages/dies sharing the
 #                    visible footprint (e.g. package-on-package)
